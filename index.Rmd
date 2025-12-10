@@ -1,0 +1,213 @@
+---
+title: "Análisis de Datos Biológicos de Ancestros Humanos"
+author:
+  - "Manuel Jesus Méndez Bautista"
+  - "Francisco Rafael Mesa Torres"
+  - "Pedro Sánchez Meléndez"
+  - "Sergio Selma González"
+date: "`r Sys.Date()`"
+output:
+  html_document:
+    toc: true
+    number_sections: true
+    font-family: "Arial"
+    theme: cerulean
+    highlight: tango
+  github_document:
+    html_preview: false
+bibliography: []
+linkcitations: True 
+
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r cargar librerias y leer archivos csv, echo=FALSE, warning=FALSE, message=FALSE}
+# Cargar librerías
+library(readr)
+library(dplyr)
+library(ggplot2)
+# Lectura de archivos CSV
+hominidos <- read_csv("Hominidos_DataSet.csv")
+evolution <- read_csv("Evolution_DataSets.csv")
+```
+
+# Introducción
+
+El estudio de la [**evolución humana**]{style="color:#CC79A7"} busca entender cómo los [*ancestros humanos*]{style="color:"} (homínidos) han cambiado a lo largo del tiempo. Los registros fósiles muestran variaciones en características biológicas como el tamaño del cráneo (capacidad craneal), la estatura, la forma de la mandíbula y la locomoción bípeda. Por ejemplo, se estima que *Homo sapiens* tiene una capacidad craneal de alrededor de 1350 cm^3^, muy superior a la de especies más antiguas como *Australopithecus africanus*. Además, cambios climáticos (como niveles de CO~2~ y expansiones de sabanas) pudieron influir en la dispersión de los homínidos fuera de África.
+
+En este proyecto analizaremos un conjunto de datos biológicos de homínidos[^1] para explorar tendencias evolutivas y realizar un análisis estadístico. *¿Las especies más recientes tienen cerebros más grandes?* *¿Qué factores pudieron influir en la migración fuera de África?* A continuación, describimos los datos y presentamos los resultados de los análisis realizados.
+
+[^1]: Datos provenientes de Kaggle: *"Biological Data of Human Ancestors Data Sets"* (Santiago, 2022).
+
+> "Este dataset se centra en homínidos consensuados."
+
+![**Figura 1.** Cronología de algunas especies de homínidos estimada en millones de años. Cada barra representa el rango de antigüedad de una especie perteneciente a *Ardipithecus*, *Australopithecus* o *Homo*.](https://upload.wikimedia.org/wikipedia/commons/7/72/Humanoid_dated_ages_comparison_01.jpg)
+
+*Figura 1*: **Cronograma evolutivo** de distintos géneros de homínidos. (Fuente: Conty, 2010, Wikimedia Commons, CC BY 3.0)
+
+*Nota:* Este informe fue generado el `r format(Sys.Date(), "%d de %B de %Y")` mediante código reproducible.
+
+# Datos y Preparación
+
+Para el análisis, se proporcionaron dos archivos CSV con información biológica de distintas especies de homínidos: `Hominidos_DataSet.csv` y `Evolution_DataSets.csv`.Vamos a comparar ambos datasets para ver cual utilizamos
+
+```{r Previsualización_evolución, echo=FALSE}
+PRE_Evo <- evolution %>% 
+  select(`Genus_&_Specie`, Time, Location)
+knitr::kable(head(PRE_Evo, 10), aling = 'c', caption= "Tabla 1. Diez primeras filas Evolution_DataSets.csv ") #Estamos filtrando los primeros datos de una tabla que hemos generado para previsualizar lo datos y ver con que dataset nos quedamos
+```
+
+```{r Previsualización_hominidos, echo=FALSE}
+PRE_Hom <- hominidos %>% 
+  select(`Genus_&_Specie`, Time, Location)
+knitr::kable(head(PRE_Hom, 10), aling = 'c', caption= "Tabla 2. Diez primeras filas Hominidos_DataSet.csv")
+```
+
+Ambos contienen datos similares, aunque el primero codifica categorías con números y el segundo incluye etiquetas descriptivas. En este trabajo utilizaremos principalmente `Evolution_DataSets.csv` por su legibilidad.
+
+Como resultado, `evolution` contiene `r nrow(evolution)` filas (observaciones) y `r ncol(evolution)` columnas (variables). Cada fila corresponde a una observación de una especie de homínido en un momento y contexto determinados (se han generado múltiples instancias por especie a partir de estimaciones). A continuación se listan algunas de las **variables de interés** incluidas:
+
+-   **Genus\_&Specie**: Nombre del género y especie (e.g., *Homo sapiens*, *Australopithecus afarensis*).
+-   **Time**: Antigüedad en millones de años (Ma) de la especie.
+-   **Cranial_Capacity**: Capacidad craneal en centímetros cúbicos (cm^3^), indicador del tamaño del cerebro.
+-   **Height**: Estatura estimada en centímetros.
+-   **Habitat**: Hábitat típico (bosque, sabana, etc.).
+-   **Diet**: Dieta predominante (frutas, omnívora, etc.).
+-   **Migrated**: Indica si hay evidencia de migración fuera de África (valores `"yes"` o `"no"`).
+
+Por ejemplo, la capacidad craneal promedio de todos los registros es aproximadamente `r round(mean(evolution$Cranial_Capacity, na.rm=TRUE), 1)` cm^3^. También observamos que las especies más recientes (menor valor de **Time**) tienden a tener mayor capacidad craneal y *Homo sapiens* es la única especie actual. Seguidamente, realizaremos algunas visualizaciones para explorar estas tendencias.
+
+# Visualización de Datos
+
+Para explorar la relación entre la antigüedad de la especie y el tamaño del cráneo, se graficó **Time** (millones de años) frente a **Cranial_Capacity** (cm^3^) para todas las observaciones. Se distingue además si la especie **migró** fuera de África o no:
+
+Primero vamos a ver las variables que vamos a seleccionar representadolas en una tabla
+
+```{r, echo=FALSE}
+cranial_zone_table <- evolution %>%
+  select(Time, Cranial_Capacity)
+cranial_zone_table
+```
+
+Aquí vemos las varables que buscamos relacionar y de esa manera confirmar nuestra hipoteis
+
+```{r figBrainTime, fig.cap="Relación entre antigüedad y capacidad craneal de homínidos. Cada punto representa una observación; se indica en color si la especie migró fuera de África.", echo=FALSE, warning=FALSE, message=FALSE}
+# Gráfico de dispersión de Time vs Cranial_Capacity, coloreando por Migrated
+ggplot(evolution, aes(x = Time, y = Cranial_Capacity, color = Migrated)) +
+  geom_point(alpha = 0.3) +
+  geom_smooth(method = "lm", color = "black") +
+  scale_color_manual(values = c("no" = "orangered", "yes" = "steelblue")) +
+  labs(title = "Capacidad craneal vs. antigüedad de la especie",
+       x = "Antigüedad (millones de años)",
+       y = "Capacidad craneal (cm^3)",
+       color = "¿Migró fuera de África?") +
+  theme_minimal(base_size = 12) +
+  theme(plot.title = element_text(face = "bold", hjust = 0.5, color = "midnightblue"),
+        legend.position = "bottom")
+```
+
+*Figura 2*: Diagrama de dispersión de la antigüedad vs capacidad craneal. Se observa una tendencia negativa: especies más recientes (más a la izquierda en el eje *x*) tienden a poseer cráneos de mayor tamaño (eje *y* más alto). Además, los puntos azules (especies migrantes) se concentran hacia tiempos más recientes y capacidades craneales mayores, mientras que los anaranjados (no migrantes) corresponden principalmente a especies más antiguas y de menor capacidad craneal.
+
+# Análisis Estadístico
+
+A partir de las observaciones anteriores, planteamos la siguiente **hipótesis**:
+
+-   *Hipótesis nula (H0)*: Las especies que migraron fuera de África no difieren en su capacidad craneal promedio de las especies que no migraron.
+-   *Hipótesis alternativa (H1)*: Las especies que migraron fuera de África tienen una capacidad craneal promedio distinta (mayor) a la de las especies que no migraron.
+
+Vamos a previsualizar los datos que vamos a usar para nuestro analisis
+
+```{r CC_Migrated, echo=FALSE}
+CC_Migrated <- evolution %>% 
+  select(Cranial_Capacity, Migrated)
+knitr::kable(head(CC_Migrated, 10), aling = 'c', caption= "Tabla 3. Filtrado de los datos usados en este analisi ")
+```
+
+Antes de probar esta hipótesis, describimos las variables involucradas: **Migrated** es una variable categórica binaria ("yes"/"no") y **Cranial_Capacity** es una variable numérica continua (medida en cm^3^). Dado que comparamos las medias de dos grupos independientes, emplearemos una prueba *t* de Student para dos muestras independientes. Esta prueba asume que los datos (capacidad craneal) en cada grupo se distribuyen aproximadamente de forma normal; considerando el tamaño de muestra grande en cada grupo, la aproximación es razonable (teorema del límite central).
+
+A continuación, calculamos las medias muestrales de capacidad craneal por grupo de migración y aplicamos la prueba *t*:
+
+```{r cranial_means, echo=FALSE, warning=FALSE, message=FALSE}
+# Calcular estadísticos descriptivos por grupo (Migrated = yes/no)
+mean_by_group <- evolution %>%
+  group_by(Migrated) %>%
+  summarize(N = n(),
+            Media = mean(Cranial_Capacity, na.rm=TRUE),
+            Desv = sd(Cranial_Capacity, na.rm=TRUE))
+knitr::kable(mean_by_group, digits = 2, 
+             caption = "Capacidad craneal media (cm^3) por grupo de migraci\u00f3n")
+```
+
+Hemos hecho esto para generar la tabla
+
+```{verbatim}
+r knitr::kable(mean_by_group, digits = 2, caption = "Capacidad craneal media (cm^3) por grupo de migraci\u00f3n")
+```
+
+Como se ve en la tabla anterior, la media de capacidad craneal de los homínidos **migrantes** es mayor que la de los **no migrantes**. Podemos verlo también en esta figura
+
+```{r, echo=FALSE, message=FALSE}
+ggplot(evolution, aes(x = Migrated, y = Cranial_Capacity)) +
+  geom_boxplot(fill = "orange", color = "purple", alpha = 0.7) +
+  labs(
+    title = "Medias Capacidad Craneal según su migración",
+    x = "Migración",
+    y = "Capacidad Craneal (cm³)"
+  )
+```
+
+Para hacer ese grafico hemos hecho:
+
+```{verbatim}
+r 
+ggplot(evolution, aes(x = Migrated, y = Cranial_Capacity)) +
+  geom_boxplot(fill = "orange", color = "purple", alpha = 0.7) + #Estamos usando el boxplot con intención de comparar las medias
+  labs(
+    title = "Medias Capacidad Craneal según su migración",
+    x = "Migración",
+    y = "Capacidad Craneal (cm³)"
+  )
+```
+
+Ahora realizamos la prueba estadística:
+
+```{r ttest, echo=FALSE, warning=FALSE, message=FALSE}
+# Prueba t de Student para Cranial_Capacity entre grupos Migrated
+resultado_t <- t.test(Cranial_Capacity ~ Migrated, data = evolution)
+resultado_t
+```
+
+El resultado de la prueba *t* indica un **p-valor** muy pequeño (p \< 0.001). Con un nivel de significación α = 0.05, rechazamos la hipótesis nula. En otras palabras, existe evidencia estadística de que la capacidad craneal promedio difiere entre homínidos migrantes y no migrantes. De hecho, la media de los migrantes es significativamente mayor, lo que sugiere que los homínidos con cerebros más grandes tuvieron mayor probabilidad de dispersarse fuera de África.
+
+Adicionalmente, como *análisis extra*, ajustamos un **modelo de regresión logística** para explorar la relación entre la capacidad craneal y la probabilidad de migrar. Este modelo estadístico nos permite cuantificar la influencia de una variable continua en una variable binaria (*Migrated*). La fórmula del modelo es:
+
+$$ \text{logit}(P(\text{Migrated} = \text{"yes"})) = \beta_0 + \beta_1 \cdot \text{Cranial_Capacity}. $$
+
+Entrenamos el modelo con los datos y obtenemos el resumen de resultados:
+
+```{r logistic, echo=FALSE, warning=FALSE, message=FALSE}
+# Convertir la variable respuesta a factor con nivel base "no"
+evolution$Migrated <- factor(evolution$Migrated, levels = c("no","yes"))
+# Ajustar modelo de regresión logística
+modelo_log <- glm(Migrated ~ Cranial_Capacity, data = evolution, family = binomial)
+summary(modelo_log)
+```
+
+Del modelo obtenido, observamos que el coeficiente asociado a **Cranial_Capacity** es positivo y estadísticamente significativo (p \< 0.001). Esto implica que un mayor tamaño cerebral aumenta la probabilidad de que la especie haya migrado fuera de África.
+
+En resumen, nuestros análisis apoyan la idea de que a medida que los homínidos evolucionaron (cerebros más grandes en promedio), también adquirieron mayor movilidad geográfica. No obstante, es importante señalar que la migración es un fenómeno multifactorial (tecnología, clima, adaptación cultural, etc.), por lo que estos resultados deben interpretarse con cautela dentro del contexto paleoantropológico.
+
+# Conclusiones
+
+-   Existe una correlación negativa entre la antigüedad de la especie y su capacidad craneal: los homínidos más recientes tienen cráneos más voluminosos.
+-   Las especies de homínidos que migraron fuera de África presentan, en promedio, una capacidad craneal significativamente mayor que las que no migraron (p \< 0.001 en la prueba t).
+-   Un modelo de regresión logística sugiere que un mayor tamaño cerebral está asociado a una mayor probabilidad de migración, lo que concuerda con la idea de que características avanzadas pudieron favorecer la dispersión.
+-   En general, los resultados respaldan la hipótesis de que la evolución biológica (p.ej., aumento del cerebro) está vinculada a cambios en el comportamiento y la distribución geográfica de los ancestros humanos.
+
+```{r sessionInfo, echo=FALSE}
+session <- sessionInfo()
+print(session)
+```
