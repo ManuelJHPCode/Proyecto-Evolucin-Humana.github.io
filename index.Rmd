@@ -1,5 +1,8 @@
 ---
-title: "Análisis de Datos Biológicos de Ancestros Humanos"
+title:  |
+  ![](Logo_UCO.png){width='15%'}
+  
+  Análisis de Datos Biológicos de Ancestros Humanos
 author:
   - "Manuel Jesus Méndez Bautista"
   - "Francisco Rafael Mesa Torres"
@@ -7,12 +10,12 @@ author:
   - "Sergio Selma González"
 date: "`r Sys.Date()`"
 output:
-  html_document:
-    toc: true
-    number_sections: true
-    font-family: "Arial"
-    theme: cerulean
-    highlight: tango
+  # html_document:
+  #   toc: true
+  #   number_sections: true
+  #   font-family: "Arial"
+  #   theme: cerulean
+  #   highlight: tango
   github_document:
     html_preview: false
 bibliography: []
