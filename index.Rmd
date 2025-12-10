@@ -2,7 +2,7 @@
 title:  |
   ![](Logo_UCO.png){width='15%'}
   
-  Análisis de Datos Biológicos de Ancestros Humanos
+  "Análisis de Datos Biológicos de Ancestros Humanos"
 author:
   - "Manuel Jesus Méndez Bautista"
   - "Francisco Rafael Mesa Torres"
