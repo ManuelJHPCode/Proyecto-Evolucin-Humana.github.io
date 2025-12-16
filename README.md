@@ -5,6 +5,8 @@
   - Pedro Sánchez Meléndez
   - Sergio Selma González
 
+## Resumen
+
 Este es el proyecto que hemos realizado entre 4 compañeros sobre una base de datos de la evolución humana. Este repositorio contiene el trabajo académico centrado en el análisis exhaustivo sobre distitos parametros. El objetivo principal es evaluar si las especies que migraron fuera de África tienen una capacidad craneal promedio distinta (mayor) a la de las especies que no migraron.
 
 El análisis incluye:
@@ -17,7 +19,7 @@ Interpretación de los resultados dentro de un marco paleoantropológico, consid
 
 El documento principal del trabajo se encuentra en formato HTML, generado a partir de código en R y texto explicativo.
 
-**Disclaimer**
+## Disclaimer
 
 Este proyecto ha sido desarrollado utilizando el lenguaje de programación R y hace uso de las siguientes librerías:
 
