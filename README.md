@@ -1,4 +1,10 @@
 # Proyecto-Evolución-Humana
+## Autores 
+  - Manuel Jesus Méndez Bautista
+  - Francisco Rafael Mesa Torres
+  - Pedro Sánchez Meléndez
+  - Sergio Selma González
+
 Este es el proyecto que hemos realizado entre 4 compañeros sobre una base de datos de la evolución humana. Este repositorio contiene el trabajo académico centrado en el análisis exhaustivo sobre distitos parametros. El objetivo principal es evaluar si las especies que migraron fuera de África tienen una capacidad craneal promedio distinta (mayor) a la de las especies que no migraron.
 
 El análisis incluye:
