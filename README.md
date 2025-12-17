@@ -21,7 +21,7 @@ El documento principal del trabajo se encuentra en formato HTML, generado a part
 
 ## Origen de los datos
 
-Los datos seleccionados para este analisis han sido seleccionados desde [aquí]([https://www.kaggle.com/](https://www.kaggle.com/datasets/santiago123678/biological-data-of-human-ancestors-data-sets/data)) el autor de estos datos es el usuario de kaggle **SantiagoCostabile**. 
+Los datos seleccionados para este analisis han sido seleccionados desde [aquí](https://www.kaggle.com/datasets/santiago123678/biological-data-of-human-ancestors-data-sets/data) el autor de estos datos es el usuario de kaggle **SantiagoCostabile**. 
 
 ## Disclaimer
 
