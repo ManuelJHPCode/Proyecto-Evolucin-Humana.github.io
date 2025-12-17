@@ -1,6 +1,6 @@
 # Proyecto-Evolución-Humana
 ## Autores 
-  - Manuel Jesus Méndez Bautista
+  - Manuel Jesús Méndez Bautista
   - Francisco Rafael Mesa Torres
   - Pedro Sánchez Meléndez
   - Sergio Selma González
@@ -18,6 +18,10 @@ Análisis descriptivo de las variables biológicas estudiadas.
 Interpretación de los resultados dentro de un marco paleoantropológico, considerando la migración como un fenómeno multifactorial (biológico, tecnológico, climático y cultural).
 
 El documento principal del trabajo se encuentra en formato HTML, generado a partir de código en R y texto explicativo.
+
+## Origen de los datos
+
+Los datos seleccionados para este analisis han sido seleccionados desde [aquí]([https://www.kaggle.com/](https://www.kaggle.com/datasets/santiago123678/biological-data-of-human-ancestors-data-sets/data) el autor de estos datos es el usuario de kaggle **SantiagoCostabile**. 
 
 ## Disclaimer
 
